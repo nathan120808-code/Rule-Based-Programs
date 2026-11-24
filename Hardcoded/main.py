@@ -36,4 +36,17 @@ def deploy_rule(facts,rules,default):
     for condition, conclusion in rules:
         if all(facts.get(attr) in allowed for attr, allowed in condition.items()):
             return conclusion, True
-    return default, False
+    return default, False #falls back to default values if none of the conditions are met in teh rules
+
+def classify(car):
+    facts= dict(car)
+    defaults_used = 0
+    for key, rules, default in [
+        ("price", PRICE_RULES, PRICE_DEF),
+        ("comfort", COMFORT_RULES, COMFORT_DEF),
+        ("class", CLASS_RULES,CLASS_DEF),
+        ("tech", TECH_RULES, TECH_DEF)
+    ]:
+        facts[key], fired = apply_rules(facts,rules,default)
+        defaults_used += (not fired)
+    return facts["class"], defaults_used
